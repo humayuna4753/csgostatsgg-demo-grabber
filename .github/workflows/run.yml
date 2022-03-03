@@ -1,0 +1,53 @@
+name: RunGrabber
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "info"
+        type: choice
+        options:
+          - trace
+          - debug
+          - info
+          - warning
+          - error
+      privacyPassTokens:
+        description: "A stringified JSON array containing any new PrivacyPass tokens to add"
+        required: false
+        type: string
+      startIdOverride:
+        description: "Overrides the csgostats.gg start match ID"
+        required: false
+        type: string
+
+jobs:
+  run_grabber:
+    name: Run Grabber
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          cache: "npm"
+          node-version-file: ".nvmrc"
+
+      # TODO: Build app in container or artifact to speed up setup
+      - run: npm ci && sudo $(npx install-browser-deps)
+
+      - run: npm start
+        env:
+          LOG_LEVEL: ${{ github.event.inputs.logLevel }}
+          PRIVACY_PASS_TOKENS: ${{ github.event.inputs.privacyPassTokens }}
+          START_ID_OVERRIDE: ${{ github.event.inputs.startIdOverride }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: progress
+          path: progress.json
+        if: always()

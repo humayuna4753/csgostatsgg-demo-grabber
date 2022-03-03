@@ -1,0 +1,56 @@
+{
+  "name": "csgostatsgg-demo-grabber",
+  "version": "1.0.0",
+  "description": "Iterate through csgostats.gg's matches and get the URLs of desired demos",
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "rimraf dist && tsc",
+    "lint": "tsc --noEmit && eslint src/**/*.ts",
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "csgostats.gg",
+    "csgo",
+    "opponent",
+    "player",
+    "faceitfinder"
+  ],
+  "author": {
+    "name": "Charlie Laabs",
+    "url": "https://github.com/claabs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "adm-zip": "^0.5.9",
+    "axios": "^0.26.0",
+    "csgostatsgg-scraper": "^1.2.1",
+    "dotenv": "^16.0.0",
+    "fs-extra": "^10.0.1",
+    "keyv": "^4.1.1",
+    "moment": "^2.29.1",
+    "pino": "^7.8.0",
+    "pino-pretty": "^7.5.1",
+    "privacy-pass-redeemer": "^1.0.2",
+    "steamid": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.4.34",
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^16.11.25",
+    "@types/steamid": "^2.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
+  },
+  "engines": {
+    "node": "16"
+  }
+}
