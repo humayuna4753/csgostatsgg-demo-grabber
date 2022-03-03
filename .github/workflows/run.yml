@@ -22,6 +22,15 @@ on:
         description: "Overrides the csgostats.gg start match ID"
         required: false
         type: string
+      goalIdOverride:
+        description: "Overrides the csgostats.gg goal match ID"
+        required: false
+        type: string
+      concurrency:
+        description: "How many browsers to run concurrently. The optimal number depends on the performance of the host system."
+        default: "5"
+        required: false
+        type: string
 
 jobs:
   run_grabber:
@@ -42,9 +51,12 @@ jobs:
 
       - run: npm start
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOG_LEVEL: ${{ github.event.inputs.logLevel }}
           PRIVACY_PASS_TOKENS: ${{ github.event.inputs.privacyPassTokens }}
           START_ID_OVERRIDE: ${{ github.event.inputs.startIdOverride }}
+          GOAL_ID_OVERRIDE: ${{ github.event.inputs.goalIdOverride }}
+          CONCURRENCY: ${{ github.event.inputs.concurrency }}
 
       - uses: actions/upload-artifact@v2
         with:
