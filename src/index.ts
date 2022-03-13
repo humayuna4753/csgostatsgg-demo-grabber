@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { CSGOStatsGGScraper } from 'csgostatsgg-scraper';
+import { CSGOStatsGGScraper, MatchMakingService } from 'csgostatsgg-scraper';
 import { writeJSONSync } from 'fs-extra';
 import asyncBatch from 'async-batch';
 import { addNewTokens } from './privacy-pass';
@@ -7,7 +7,7 @@ import { getLatestProgress, GrabberProgress } from './progress';
 import L from './logger';
 import { range } from './util';
 
-export interface MatchOutput {
+export interface MatchData {
   id: number;
   watchUrl: string;
 }
@@ -53,13 +53,19 @@ async function main() {
 
     const desiredMatchIds = range(progress.currentId, progress.goalId);
 
-    const parseMatch = async (id: number): Promise<MatchOutput | null> => {
+    const parseMatch = async (id: number): Promise<MatchData | null> => {
       progress.currentId = id;
       try {
         const matchSummary = await scraper.getMatch(id);
-        L.debug(`Progress: ${progress.goalId - id}/${desiredMatchIds.length}`);
+        L.debug(
+          `Progress: ${desiredMatchIds.length - progress.goalId - id}/${desiredMatchIds.length}`
+        );
         L.trace({ id, matchSummary }, 'Finished scraping match');
-        if (matchSummary.hasBannedPlayer && matchSummary.watchUrl) {
+        if (
+          matchSummary.matchmakingService === MatchMakingService.MM &&
+          matchSummary.hasBannedPlayer &&
+          matchSummary.watchUrl
+        ) {
           L.info({ id }, 'found demo with banned player');
           return {
             id,
@@ -76,9 +82,8 @@ async function main() {
     const rawScrapeResults = await asyncBatch(desiredMatchIds, parseMatch, concurrency);
     L.info(`Finished scraping ${rawScrapeResults.length} matches`);
 
-    const prunedScrapeResults = rawScrapeResults.filter(
-      (elem): elem is MatchOutput => elem !== null
-    );
+    const prunedScrapeResults = rawScrapeResults.filter((elem): elem is MatchData => elem !== null);
+
     writeJSONSync('match-output.json', prunedScrapeResults);
     await scraper.close();
   } catch (err) {
